@@ -1,6 +1,10 @@
 #ifndef EMUASM
 #define EMUASM
 
+#if defined(WINDOWS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdio.h>
 #include <vadefs.h>
 #include <string.h>
@@ -8,7 +12,6 @@
 int emuasm(int argc, char* argv);
 
 #if defined(WINDOWS)
-#define CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #define clear() system("cls")
 int print(const char* format, ...) {
@@ -122,6 +125,12 @@ int fscan(char* buffer, const char* format, ...) {
 
 #define byte unsigned char
 
+char scmp(const char* a, const char* b) { return strcmp(a, b) == 0; }
+char* scat(const char* buffer, char* head, char* body) {
+	sscanf(buffer, "%s %[^\n]", head, body);
+	return body;
+}
+
 byte cph = 0;
 byte cpl = 0;
 byte zf = 0;
@@ -174,11 +183,11 @@ void mul(byte dest, byte src) {
 	ra = (dest * src) >> 8;
 	rb = (dest * src) & 0xFF;
 }
-void div(byte src) {
+void _div(byte src) {
 	push(rd); push(re);
 	mov(&rd, ra); mov(&re, rb);
-	ra = ((rd << 8 + re) / src) & 0xFF;
-	rb = ((rd << 8 + re) % src);
+	ra = (((rd << 8) + re) / src) & 0xFF;
+	rb = (((rd << 8) + re) % src);
 	pop(&re); pop(&rd);
 }
 
