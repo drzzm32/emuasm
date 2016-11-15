@@ -6,13 +6,13 @@
 #endif
 
 #include <stdio.h>
-#include <vadefs.h>
 #include <string.h>
 
 int emuasm(int argc, char* argv);
 
 #if defined(WINDOWS)
 #include <stdlib.h>
+#include <vadefs.h>
 #define clear() system("cls")
 int print(const char* format, ...) {
 	va_list args = 0;
@@ -40,6 +40,7 @@ int main(int argc, char* argv) {
 
 #elif defined(LINUX)
 #include <stdlib.h>
+#include <stdarg.h>
 #define clear() system("clear")
 int print(const char* format, ...) {
 	va_list args = 0;
@@ -51,7 +52,7 @@ int print(const char* format, ...) {
 int scan(char* buffer) { return gets(buffer); }
 int fscan(char* buffer, const char* format, ...) {
 	gets(buffer);
-	va_list args = 0;
+	va_list args;
 	va_start(args, format);
 	int result = vsscanf(buffer, format, args);
 	va_end(args);
@@ -65,12 +66,13 @@ int main(int argc, char* argv) {
 }
 
 #elif defined(ARDUINO)
+#include <stdarg.h>
 #define IOBUF 128
 #define BACKCOLOR 0x0000
 #define clear() { tft.setCursor(0, 0); tft.fillScreen(BACKCOLOR); }
 int print(const char* format, ...) {
 	char* iobuf = malloc(sizeof(char) * IOBUF);
-	va_list args = 0;
+	va_list args;
 	va_start(args, format);
 	int result = vsprintf(iobuf, format, args);
 	va_end(args);
